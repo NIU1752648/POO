@@ -1,7 +1,32 @@
 @startuml
 
-object main {
-    ...
+class NBodySimulator {
+-windowsize: int
++NBodySimulator(universe: Universe, windowSize: int)
+-draw_bodies(color: float[3], size: float)
 }
+
+class Universe {
+-radius: float
+-name: String
+-numBodies: int
++Universe(name: String) : Universe
++getBodyPosition(idxBody: int) : float[2]
++update(timeStep: float) : void
+-computeForces() : float[][2]
+}
+
+class Body {
+{static} G: Float
+-position : float[2]
+-velocity : float[2]
+-mass : float
++Body(m : float, pos : float[2], vel : float[2]) : Body
++forceFrom(b : Body)
++move(force: Float[2], timeStep: float)
+}
+
+Universe "   1" -left-* NBodySimulator: universe
+Body "1..*" -left-* Universe: bodies
 
 @enduml
