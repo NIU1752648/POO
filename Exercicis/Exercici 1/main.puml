@@ -1,29 +1,24 @@
 @startuml
 
 class NBodySimulator {
--windowsize: int
+-step: float
+-step_num: int
 +NBodySimulator(universe: Universe, windowSize: int)
--draw_bodies(color: float[3], size: float)
 }
 
 class Universe {
 -radius: float
--name: String
 -numBodies: int
-+Universe(name: String) : Universe
-+getBodyPosition(idxBody: int) : float[2]
-+update(timeStep: float) : void
--computeForces() : float[][2]
++Universe(name: string): Universe
++from_file(filename: string): Universe
 }
 
 class Body {
-{static} G: Float
--position : float[2]
--velocity : float[2]
+{static} G: float
+-position : np.array
+-velocity : np.array
 -mass : float
 +Body(m : float, pos : float[2], vel : float[2]) : Body
-+forceFrom(b : Body)
-+move(force: Float[2], timeStep: float)
 }
 
 note bottom of NBodySimulator: "universe és un atribut implicit del tipus Universe"
