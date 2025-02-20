@@ -8,6 +8,9 @@ import numpy as np
 import matplotlib.pyplot as mpl
 import pygame
 
+class Integrator: #Future implementation Runge-Kutta
+    pass
+
 class Body:
     G = 6.67e-11 # Static Attribute
 
@@ -19,7 +22,21 @@ class Body:
 
     @property
     def mass(self):
-        return self._mass # Read-only (private mass)
+        """Getter for private attribute mass"""
+        return self._mass
+
+    @staticmethod
+    def _distance(a, b) -> float:
+        """Calculate the distance between two points"""
+        pass #TODO
+
+    def force_from(self, other) -> np.array:
+        """Calculate the force acting on our object by another object"""
+        pass #TODO
+
+    def update(self, total_force: np.array, step: float):
+        """Updates all vectors associated to Body"""
+        pass #TODO
 
     def __str__(self):
         return f"Body of {self.mass} kg, positioned at {self.position} m and moving at {self.velocity} m/s"
@@ -34,6 +51,11 @@ class Universe:
     def num_bodies(self):
         """Getter for private attribute num_bodies"""
         return self._num_bodies
+
+    @staticmethod
+    def forces_acting_upon(body: Body) -> np.array:
+        """Calculates the sum of all forces acting on a Body"""
+        pass #TODO
 
     @classmethod
     def from_file(cls, filename):
@@ -54,9 +76,10 @@ class Universe:
         return f"Universe of radius: {self.radius}, formed by bodies:{bs}{bs.join(str(body) for body in self.bodies)}"
 
 class NBodySimulator:
-    def __init__(self, step: float, step_num: int, filename: string):
+    def __init__(self, step: float, step_num: int, filename: str):
         self._step = step
         self._step_num = step_num
+        self._t = float()
         self.universe = Universe.from_file(filename)
 
 if __name__ == "__main__":

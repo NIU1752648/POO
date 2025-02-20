@@ -3,6 +3,7 @@
 class NBodySimulator {
 -step: float
 -step_num: int
+-t: float
 +NBodySimulator(universe: Universe, windowSize: int)
 }
 
@@ -10,6 +11,7 @@ class Universe {
 -radius: float
 -numBodies: int
 +Universe(name: string): Universe
++forces_acting_upon(body: Body) -> np.array
 +from_file(filename: string): Universe
 }
 
@@ -19,6 +21,9 @@ class Body {
 -velocity : np.array
 -mass : float
 +Body(m : float, pos : float[2], vel : float[2]) : Body
+-distance(a: float, b: float): float
++force_from(self: Body, other: Body): np.array
++update(self: Body, total_force: np.array, step: float): void
 }
 
 note bottom of NBodySimulator: "universe és un atribut implicit del tipus Universe"
