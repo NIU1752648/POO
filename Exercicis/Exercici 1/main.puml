@@ -26,6 +26,9 @@ class Body {
 +move(force: Float[2], timeStep: float)
 }
 
+note bottom of NBodySimulator: "universe és un atribut implicit del tipus Universe"
+note bottom of Universe: "bodies és un atribut implicit del tipus Body[numBodies]"
+
 Universe "   1" -left-* NBodySimulator: universe
 Body "1..*" -left-* Universe: bodies
 
