@@ -5,6 +5,8 @@ class NBodySimulator {
 -step_num: int
 -t: float
 +NBodySimulator(universe: Universe, windowSize: int)
++animate(): void
+-draw_body(): void
 }
 
 class Universe {

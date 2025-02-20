@@ -76,11 +76,25 @@ class Universe:
         return f"Universe of radius: {self.radius}, formed by bodies:{bs}{bs.join(str(body) for body in self.bodies)}"
 
 class NBodySimulator:
-    def __init__(self, step: float, step_num: int, filename: str):
+    def __init__(self, step: float, step_num: int, filename: str, window_size = 600):
         self._step = step
         self._step_num = step_num
         self._t = float()
         self.universe = Universe.from_file(filename)
+        self._window_size = window_size
+
+    @property
+    def window_size(self):
+        return self._window_size
+
+    def animate(self):
+        pass
+
+    def _draw_body(self):
+        pass
+
+
+
 
 if __name__ == "__main__":
     universe = Universe.from_file("data/3body2.txt")
