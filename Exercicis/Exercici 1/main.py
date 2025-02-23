@@ -68,10 +68,10 @@ class Universe:
 
     def _forces_acting_upon(self, body: Body) -> np.array:
         """Calculates the sum of all forces acting on a Body"""
-        sum = np.array((0.0, 0.0))
+        n_sum = np.array((0.0, 0.0))
         for other in self.bodies:
-            sum += body.force_from(other)
-        return sum
+            n_sum += body.force_from(other)
+        return n_sum
 
     def update(self, step: float):
         for body in self.bodies:
@@ -146,7 +146,7 @@ class NBodySimulator:
         #TODO: Does not draw
         for body in self.universe.bodies:
             self._point(body.position[0], body.position[1])
-        self.universe.update(self._step)
+        self._update()
         pygame.display.flip()
         self._clock.tick(60)
 
@@ -187,4 +187,4 @@ def main():
     pygame.quit()
 
 if __name__ == "__main__":
-    main()
+    sim = NBodySimulator(0.001, 100, "data/3body2.txt")
