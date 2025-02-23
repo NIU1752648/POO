@@ -8,6 +8,7 @@ import math
 import numpy as np
 #import matplotlib.pyplot as mpl
 import pygame
+from time import sleep
 
 class Integrator: #Future implementation Runge-Kutta
     pass
@@ -35,7 +36,7 @@ class Body:
         """Calculate the force acting on our object by another object"""
         try:
             d = Body._distance(self.position, other.position)
-            return Body.G * ((self.mass * other.mass)/d**2) * ((other.position - self.position)/d)
+            return Body.G * ((self.mass * other.mass)/d**3) * (other.position - self.position)
         except ZeroDivisionError:
             return np.array((0, 0))
 
@@ -87,13 +88,13 @@ class Universe:
             for x in range(num_bodies): # Iterates for each Body
                 line = file.readline()
                 if line != '':
-                    m, px, py, vx, vy = [float(z) for z in line.strip().split(' ') if z]
+                    px, py, vx, vy, m = [float(z) for z in line.strip().split(' ') if z]
                     bodies.append(Body(m, [px, py], [vx, vy]))
         return cls(radius, bodies)
 
     def __str__(self):
         bs = '\n' # Backslash
-        return f"Universe of radius: {self.radius}, formed by bodies:{bs}{bs.join(str(body) for body in self.bodies)}"
+        return f"Universe of radius: {self.radius}, formed by bodies:{bs}{bs.join(str(body) + ' Total forces: ' + str(self._forces_acting_upon(body)) for body in self.bodies)}"
 
 class NBodySimulator:
     def __init__(self, step: float, step_num: int, filename: str, window_size = 600):
@@ -125,22 +126,23 @@ class NBodySimulator:
 
     def _rescale(self, point: np.array) -> np.array:
         r = self.universe.radius
-        return self.window_size * np.array(
-            ((point[0] - r) / (2 * r),
-            (r - point[1]) / (2 * r))
-        )
+        # Normalize to [0, 1] range
+        normalized_x = (point[0] + r) / (2 * r)
+        normalized_y = (r - point[1]) / (2 * r)  # Invert y-axis for Pygame
+        # Scale to screen size
+        screen_x = int(normalized_x * self.window_size)
+        screen_y = int(normalized_y * self.window_size)
+        return np.array([screen_x, screen_y])
 
     def fill_screen(self):
         self._screen.fill("purple")
 
     def _point(self, x: float, y:float):
-        n_point = self._rescale(np.array((x, y)))
-        r_x = n_point[0]
-        r_y = n_point[1]
+        r_x, r_y = self._rescale(np.array((x, y)))
         pygame.draw.circle(self._screen,
-                           (0, 0, 0),
+                           (255, 255, 255),
                            (r_x, r_y),
-                           0.125)
+                           1)
 
     def draw(self):
         #TODO: Does not draw
@@ -162,7 +164,7 @@ class NBodySimulator:
 
 
 def main():
-    sim = NBodySimulator(0.001, 100, "data/3body2.txt")
+    sim = NBodySimulator(0.01, 100, "data/4body.txt")
 
     sim.open_window()
 
@@ -176,6 +178,7 @@ def main():
         sim.fill_screen()
         sim.log_state()
         sim.draw()
+        sleep(0.1)
 
     print("Simulation Ended")
     # If simulation ends, don't close window
@@ -187,4 +190,4 @@ def main():
     pygame.quit()
 
 if __name__ == "__main__":
-    sim = NBodySimulator(0.001, 100, "data/3body2.txt")
+    main()
