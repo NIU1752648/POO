@@ -142,10 +142,10 @@ class NBodySimulator:
         pygame.draw.circle(self._screen,
                            (255, 255, 255),
                            (r_x, r_y),
-                           1)
+                           5)
 
     def draw(self):
-        #TODO: Does draw but is not updating screen
+        self.fill_screen()
         for body in self.universe.bodies:
             self._point(body.position[0], body.position[1])
         self._update()
