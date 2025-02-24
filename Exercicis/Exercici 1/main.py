@@ -145,7 +145,7 @@ class NBodySimulator:
                            1)
 
     def draw(self):
-        #TODO: Does not draw
+        #TODO: Does draw but is not updating screen
         for body in self.universe.bodies:
             self._point(body.position[0], body.position[1])
         self._update()
@@ -164,7 +164,7 @@ class NBodySimulator:
 
 
 def main():
-    sim = NBodySimulator(0.01, 100, "data/4body.txt")
+    sim = NBodySimulator(0.01, 1000, "data/3body2.txt")
 
     sim.open_window()
 
@@ -176,9 +176,8 @@ def main():
                 force_stop = False
 
         sim.fill_screen()
-        sim.log_state()
+        #sim.log_state()
         sim.draw()
-        sleep(0.1)
 
     print("Simulation Ended")
     # If simulation ends, don't close window
