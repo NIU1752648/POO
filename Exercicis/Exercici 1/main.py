@@ -6,12 +6,7 @@ Autors: Celia, Gea, Nico
 
 import math
 import numpy as np
-#import matplotlib.pyplot as mpl
 import pygame
-from time import sleep
-
-class Integrator: #Future implementation Runge-Kutta
-    pass
 
 class Body:
     G = 6.67e-11 # Static Attribute
@@ -19,13 +14,22 @@ class Body:
     def __init__(self, mass: float, initial_position: list, initial_velocity: list):
         """Initializes a new instance of a Body"""
         self._mass = mass # Private
-        self.position = np.array(initial_position) # Public
-        self.velocity = np.array(initial_velocity) # Public
+        self._position = np.array(initial_position) # Public
+        self._velocity = np.array(initial_velocity) # Public
 
     @property
     def mass(self):
         """Getter for private attribute mass"""
         return self._mass
+
+    @property
+    def position(self):
+        return self._position
+
+    @property
+    def velocity(self):
+        return self._velocity
+
 
     @staticmethod
     def _distance(a: np.array, b: np.array) -> float:
@@ -42,8 +46,8 @@ class Body:
 
     def update(self, total_force: np.array, step: float):
         """Updates all vectors associated to Body"""
-        self.velocity += (total_force/self.mass)*step
-        self.position += self.velocity*step
+        self._velocity += (total_force/self.mass)*step
+        self._position += self.velocity*step
 
     def __str__(self):
         return f"Body of {self.mass} kg, positioned at {self.position} m and moving at {self.velocity} m/s"
@@ -64,7 +68,6 @@ class Universe:
 
     @property
     def num_bodies(self):
-        """Getter for private attribute num_bodies"""
         return self._num_bodies
 
     def _forces_acting_upon(self, body: Body) -> np.array:
@@ -97,9 +100,8 @@ class Universe:
         return f"Universe of radius: {self.radius}, formed by bodies:{bs}{bs.join(str(body) + ' Total forces: ' + str(self._forces_acting_upon(body)) for body in self.bodies)}"
 
 class NBodySimulator:
-    def __init__(self, step: float, step_num: int, filename: str, window_size = 600):
+    def __init__(self, step: float, filename: str, window_size = 600):
         self._step = step
-        self._step_num = step_num
         self._time_passed = float()
         self._t = int()
         self.universe = Universe.from_file(filename)
@@ -115,9 +117,6 @@ class NBodySimulator:
         pygame.init()
         self._screen = pygame.display.set_mode((600, 600))
         self._clock = pygame.time.Clock()
-
-    def sim_ended(self) -> bool:
-        return self._t == self._step_num
 
     def _update(self):
         self.universe.update(self._step)
@@ -137,20 +136,18 @@ class NBodySimulator:
     def fill_screen(self):
         self._screen.fill("purple")
 
-    def _point(self, x: float, y:float):
+    def _point(self, x: float, y:float, color, radius):
         r_x, r_y = self._rescale(np.array((x, y)))
         pygame.draw.circle(self._screen,
-                           (255, 255, 255),
+                           color,
                            (r_x, r_y),
-                           5)
+                           radius)
 
     def draw(self):
-        self.fill_screen()
-        for body in self.universe.bodies:
-            self._point(body.position[0], body.position[1])
         self._update()
+        for body in self.universe.bodies:
+            self._point(body.position[0], body.position[1], (255, 255, 255), 5)
         pygame.display.flip()
-        self._clock.tick(60)
 
     #TEMP
     def log_state(self):
@@ -165,32 +162,24 @@ class NBodySimulator:
 
 def main():
     try:
-        sim = NBodySimulator(0.01, 1000, "data/3body2.txt")
+        sim = NBodySimulator(1000, "data/5body.txt")
     except FileNotFoundError:
-        sim = NBodySimulator(0.01, 1000, "Exercicis/Exercici 1/data/3body2.txt")
+        sim = NBodySimulator(1000, "Exercicis/Exercici 1/data/3body2.txt")
 
 
     sim.open_window()
-
+    sim.fill_screen()
     force_stop = True
 
-    while not (sim.sim_ended()) and force_stop:
+    while force_stop:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 force_stop = False
 
         sim.fill_screen()
-        sim.log_state()
         sim.draw()
 
     print("Simulation Ended")
-    # If simulation ends, don't close window
-    running = True
-    while running and force_stop:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-    pygame.quit()
 
 if __name__ == "__main__":
     main()
