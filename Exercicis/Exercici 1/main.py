@@ -164,7 +164,11 @@ class NBodySimulator:
 
 
 def main():
-    sim = NBodySimulator(0.01, 1000, "data/3body2.txt")
+    try:
+        sim = NBodySimulator(0.01, 1000, "data/3body2.txt")
+    except FileNotFoundError:
+        sim = NBodySimulator(0.01, 1000, "Exercicis/Exercici 1/data/3body2.txt")
+
 
     sim.open_window()
 
@@ -176,7 +180,7 @@ def main():
                 force_stop = False
 
         sim.fill_screen()
-        #sim.log_state()
+        sim.log_state()
         sim.draw()
 
     print("Simulation Ended")
