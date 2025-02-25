@@ -7,6 +7,7 @@ Autors: Celia, Gea, Nico
 import math
 import numpy as np
 import pygame
+from random import uniform
 
 class Body:
     G = 6.67e-11 # Static Attribute
@@ -95,16 +96,43 @@ class Universe:
                     bodies.append(Body(m, [px, py], [vx, vy]))
         return cls(radius, bodies)
 
+    @classmethod
+    def random(cls, n: int):
+        radius = 1e12
+        bodies = list()
+        for i in range(n):
+            if i % 2:
+                x_0 = 0.0
+                x_1 = uniform(-radius, radius)
+                v_0 = uniform(0, 1e4)
+                v_1 = 0.0
+            else:
+                x_0 = uniform(-radius, radius)
+                x_1 = 0.0
+                v_1 = uniform(0, 1e4)
+                v_0 = 0.0
+            bodies.append(Body(
+                uniform(1e22, 1e23),
+                [x_0, x_1],
+                [v_0, v_1]
+            ))
+        bodies.append(Body(
+            uniform(1e30, 1e31),
+            [0.0, 0.0],
+            [0.0, 0.0]
+        ))
+        return cls(radius, bodies)
+
     def __str__(self):
         bs = '\n' # Backslash
         return f"Universe of radius: {self.radius}, formed by bodies:{bs}{bs.join(str(body) + ' Total forces: ' + str(self._forces_acting_upon(body)) for body in self.bodies)}"
 
 class NBodySimulator:
-    def __init__(self, step: float, filename: str, window_size = 600):
+    def __init__(self, step: float, universe: Universe, window_size = 600):
         self._step = step
         self._time_passed = float()
         self._t = int()
-        self.universe = Universe.from_file(filename)
+        self.universe = universe
         self._window_size = window_size
         self._screen = None
         self._clock = None
@@ -137,16 +165,26 @@ class NBodySimulator:
         self._screen.fill("purple")
 
     def _point(self, x: float, y:float, color, radius):
-        r_x, r_y = self._rescale(np.array((x, y)))
         pygame.draw.circle(self._screen,
                            color,
-                           (r_x, r_y),
+                           (x, y),
                            radius)
 
-    def draw(self):
-        self._update()
-        for body in self.universe.bodies:
-            self._point(body.position[0], body.position[1], (255, 255, 255), 5)
+    def draw(self, trace = False):
+        if trace:
+            for body in self.universe.bodies:
+                r_x, r_y = self._rescale(np.array((body.position[0], body.position[1])))
+                self._point(r_x, r_y, (180, 180, 180), 5)
+            self._update()
+            for body in self.universe.bodies:
+                r_x, r_y = self._rescale(np.array((body.position[0], body.position[1])))
+                self._point(r_x, r_y, (255, 255, 255), 5)
+        else:
+            self.fill_screen()
+            self._update()
+            for body in self.universe.bodies:
+                r_x, r_y = self._rescale(np.array((body.position[0], body.position[1])))
+                self._point(r_x, r_y, (255, 255, 255), 5)
         pygame.display.flip()
 
     #TEMP
@@ -162,10 +200,13 @@ class NBodySimulator:
 
 def main():
     try:
-        sim = NBodySimulator(1000, "data/5body.txt")
+        sim = NBodySimulator(1000, Universe.from_file("data/3body2.txt"))
     except FileNotFoundError:
-        sim = NBodySimulator(1000, "Exercicis/Exercici 1/data/3body2.txt")
+        sim = NBodySimulator(1000, Universe.from_file("data/5body.txt"))
 
+    #sim = NBodySimulator(1000, Universe.random(14))
+
+    print(sim.universe)
 
     sim.open_window()
     sim.fill_screen()
@@ -176,8 +217,7 @@ def main():
             if event.type == pygame.QUIT:
                 force_stop = False
 
-        sim.fill_screen()
-        sim.draw()
+        sim.draw(trace = True)
 
     print("Simulation Ended")
 
