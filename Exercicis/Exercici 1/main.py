@@ -31,7 +31,6 @@ class Body:
     def velocity(self):
         return self._velocity
 
-
     @staticmethod
     def _distance(a: np.array, b: np.array) -> float:
         """Calculate the distance between two points"""
@@ -200,7 +199,7 @@ class NBodySimulator:
 
 def main():
     try:
-        sim = NBodySimulator(1000, Universe.from_file("data/3body2.txt"))
+        sim = NBodySimulator(1000, Universe.from_file("data/2body.txt"))
     except FileNotFoundError:
         sim = NBodySimulator(1000, Universe.from_file("data/5body.txt"))
 
