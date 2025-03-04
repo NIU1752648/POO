@@ -1,0 +1,24 @@
+@startuml
+class RandomForestClassifier {
+cosas()...
+}
+
+interface Node {
+{abstract} +predict(x : list(float)) : int
+}
+
+class Leaf {
++predict(x : list(float)) : int
+}
+
+class Parent {
++predict(x : list(float)) : int
+}
+
+RandomForestClassifier *-right-> "1..*" Node : decision_trees
+Leaf -up--|> Node
+Parent -up--|> Node
+Parent ---> Node : left_child
+Parent ---> Node : right_child
+
+@enduml
