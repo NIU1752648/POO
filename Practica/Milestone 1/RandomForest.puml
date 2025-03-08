@@ -1,6 +1,13 @@
 @startuml
 class RandomForestClassifier {
-cosas()...
++fit()
+-make_decision_trees()
+-make_node()
+-make_leaf()
+-make_parent_or_leaf()
+-best_split()
+-CART_cost()
+-gini()
 }
 
 interface Node {
@@ -15,10 +22,15 @@ class Parent {
 +predict(x : list(float)) : int
 }
 
+class Dataset {
++split()
+}
+
 RandomForestClassifier *-right-> "1..*" Node : decision_trees
 Leaf -up--|> Node
 Parent -up--|> Node
 Parent ---> Node : left_child
 Parent ---> Node : right_child
+RandomForestClassifier .down. Dataset
 
 @enduml
