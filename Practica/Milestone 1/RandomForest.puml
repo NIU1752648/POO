@@ -1,5 +1,6 @@
 @startuml
 class RandomForestClassifier {
++MAX_DEPTH
 +fit()
 -make_decision_trees()
 -make_node()
@@ -23,6 +24,12 @@ class Parent {
 }
 
 class Dataset {
++ {static}X
++ {static}y
++ {static}num_samples
++ {static}num_features
+
++ most_frequent_label()
 +split()
 }
 
