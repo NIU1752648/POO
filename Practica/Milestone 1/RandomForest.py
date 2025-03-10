@@ -5,18 +5,21 @@ import numpy as np
 
 class RandomForest:
     def __init__(self):
-        self.num_trees = 100
-        self.ratio_samples = 1.0
-        self.max_depth = 10
-        self.min_size = 1
-        self.num_features = 0
+        self.ratio_training = 0.7
+        self.ratio_testing = 0.3
+        self.num_trees = 100 # Number of trees in the forest
+        self.ratio_samples = 0.8 # Percentage of uses of the training set for training each tree (1.0 = 100%)
+        self.max_depth = None # Maximum depth of the decision trees
+        self.min_size = 1 # Minimum number of samples in a node to be considered for splitting
+        self.num_features = 0 # Number of features to consider when looking for the best split
         self.decision_trees = []
+        self.impurity_function = RandomForest._gini
 
-    def fit (self, X: np.array, y: np.array):
+    def fit(self, X: np.array, y: np.array):
         # X is a matrix of size (num_samples, num_features)
         # y is a vector of size (num_samples, 1)
         # a pair (X,y) is a dataset, with its own responasibilities
-        dataset=Dataset(X,y)
+        dataset = Dataset(X,y)
         self._make_decision_trees(dataset)
 
     def _make_decision_trees(self, dataset: Dataset):
@@ -76,11 +79,10 @@ class RandomForest:
                         idx, val, cost, [left_dataset,right_dataset]
         return best_feature_index, best_threshold, minimum_cost, best_split
     
-    @staticmethod
-    def _CART_cost(left_dataset: Dataset, right_dataset: Dataset, dataset: Dataset):
+    def _CART_cost(self, left_dataset: Dataset, right_dataset: Dataset, dataset: Dataset):
         # the J(k,v) equation, using Gini
-        cost = (left_dataset.num_samples/dataset.num_samples)*RandomForest._gini(left_dataset)\
-            + (right_dataset.num_samples/dataset.num_samples)*RandomForest._gini(right_dataset)
+        cost = (left_dataset.num_samples/dataset.num_samples)*self.impurity_function(left_dataset)\
+            + (right_dataset.num_samples/dataset.num_samples)*self.impurity_function(right_dataset)
         return cost 
     
     @staticmethod
@@ -94,3 +96,8 @@ class RandomForest:
             gini += (count/dataset.num_samples)**2
         gini = 1 - gini
         return gini
+    
+    @staticmethod
+    def _entropy():
+        # The entropy impurity equation
+        pass

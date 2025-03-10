@@ -1,14 +1,20 @@
-@startuml
+@startuml RandomForestClassifier
+
 class RandomForestClassifier {
-+MAX_DEPTH
++ratio_training
++ratio_testing
++num_trees
++ratio_samples
++max_depth
 +fit()
 -make_decision_trees()
 -make_node()
 -make_leaf()
 -make_parent_or_leaf()
 -best_split()
-- {static}CART_cost()
-- {static}gini()
+-CART_cost()
+-{static}gini()
+-{static}entropy()
 }
 
 interface Node {
