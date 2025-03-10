@@ -7,8 +7,8 @@ class RandomForestClassifier {
 -make_leaf()
 -make_parent_or_leaf()
 -best_split()
--CART_cost()
--gini()
+- {static}CART_cost()
+- {static}gini()
 }
 
 interface Node {
