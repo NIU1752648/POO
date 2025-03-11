@@ -3,7 +3,7 @@ from Leaf import Leaf
 from Dataset import Dataset
 import numpy as np
 
-class RandomForest:
+class RandomForestClassifier:
     def __init__(self):
         self.ratio_training = 0.7
         self.ratio_testing = 0.3
@@ -13,12 +13,12 @@ class RandomForest:
         self.min_size = 1 # Minimum number of samples in a node to be considered for splitting
         self.num_features = 0 # Number of features to consider when looking for the best split
         self.decision_trees = []
-        self.impurity_function = RandomForest._gini
+        self.impurity_function = 'gini'
 
     def fit(self, X: np.array, y: np.array):
         # X is a matrix of size (num_samples, num_features)
         # y is a vector of size (num_samples, 1)
-        # a pair (X,y) is a dataset, with its own responasibilities
+        # a pair (X,y) is a dataset, with its own responsibilities
         dataset = Dataset(X,y)
         self._make_decision_trees(dataset)
 
@@ -40,24 +40,24 @@ class RandomForest:
         else:
             node = self._make_parent_or_leaf(dataset,depth)
         return node
-    
-    def _make_leaf(self, dataset: Dataset):
+
+    @staticmethod
+    def _make_leaf(dataset: Dataset):
         # label = most frequent class in dataset
         return Leaf(dataset.most_frequent_label())
     
     def _make_parent_or_leaf(self, dataset: Dataset, depth: int):
         # select a random subset of features, to make trees more diverse
-        idx_features = np.random.choice(dataset.num_features,
-                                        self.num_features,replace=False)
+        idx_features = np.random.choice(dataset.num_features, self.num_features,replace=False)
         best_feature_index, best_threshold, minimum_cost, best_split = \
             self._best_split(dataset,idx_features)
-        
-        left_dataset, right_dataset = self._best_split(dataset, idx_features)
+        left_dataset, right_dataset = best_split
+
         assert left_dataset.num_samples > 0 or right_dataset.num_samples > 0
         if left_dataset.num_samples == 0 or right_dataset.num_samples == 0:
-            # this is an special case: dataset has samples of at least two
+            # this is a special case: dataset has samples of at least two
             # classes but the best split is moving all samples to the left or right
-            # datset and none to the other, so we make leaf instead of a parent
+            # dataset and none to the other, so we make leaf instead of a parent
             return self._make_leaf(dataset)
         else:
             node = Parent(best_feature_index,best_threshold)
@@ -65,39 +65,44 @@ class RandomForest:
             node.right_child = self._make_node(right_dataset,depth+1)
             return node
         
-    def _best_split(self, dataset: Dataset, idx_features: int):
+    def _best_split(self, dataset: Dataset, idx_features: np.array):
         # find the best pair (feature, threshold) by exploring all possible pairs
         best_feature_index, best_threshold, minimum_cost, best_split = \
-            np.Inf, np.Inf, np.Inf, None
+            np.inf, np.inf, np.inf, None
         for idx in idx_features:
             values = np.unique(dataset.X[:,idx])
             for val in values:
                 left_dataset, right_dataset = dataset.split(idx,val)
-                cost = self._CART_cost(left_dataset,right_dataset)
+                cost = self._cart_cost(left_dataset,right_dataset)
                 if cost < minimum_cost:
                     best_feature_index, best_threshold, minimum_cost, best_split = \
                         idx, val, cost, [left_dataset,right_dataset]
         return best_feature_index, best_threshold, minimum_cost, best_split
     
-    def _CART_cost(self, left_dataset: Dataset, right_dataset: Dataset, dataset: Dataset):
-        # the J(k,v) equation, using Gini
-        cost = (left_dataset.num_samples/dataset.num_samples)*self.impurity_function(left_dataset)\
-            + (right_dataset.num_samples/dataset.num_samples)*self.impurity_function(right_dataset)
+    def _cart_cost(self, left_dataset: Dataset, right_dataset: Dataset, dataset: Dataset):
+        cost = 0
+        # the J(k,v) equation
+        if self.impurity_function == 'gini':
+            cost = (left_dataset.num_samples/dataset.num_samples)*self._gini(left_dataset)\
+                + (right_dataset.num_samples/dataset.num_samples)*self._gini(right_dataset)
+        elif self.impurity_function == 'entropy':
+            cost = (left_dataset.num_samples / dataset.num_samples) * self._entropy(left_dataset) \
+                   + (right_dataset.num_samples / dataset.num_samples) * self._entropy(right_dataset)
         return cost 
     
     @staticmethod
     def _gini(dataset: Dataset):
         # the Gini impurity equation
+        gini = 1
         for label in np.unique(dataset.y):
             count = 0
             for elem in dataset.y:
                 if elem == label:
                     count += 1
-            gini += (count/dataset.num_samples)**2
-        gini = 1 - gini
+            gini -= (count/dataset.num_samples)**2
         return gini
     
     @staticmethod
-    def _entropy():
+    def _entropy(dataset: Dataset):
         # The entropy impurity equation
-        pass
+        return 1

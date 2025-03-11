@@ -1,5 +1,15 @@
 @startuml RandomForestClassifier
 
+class RandomForestEvaluator {
+-random_forest
+-train_dataset
+-test_dataset
++train()
++evaluate()
++graph_tree_answer(sample: np.array)
++graph_performance()
+}
+
 class RandomForestClassifier {
 +ratio_training
 +ratio_testing
@@ -9,10 +19,10 @@ class RandomForestClassifier {
 +fit()
 -make_decision_trees()
 -make_node()
--make_leaf()
+- {static}make_leaf()
 -make_parent_or_leaf()
 -best_split()
--CART_cost()
+-cart_cost()
 -{static}gini()
 -{static}entropy()
 }
@@ -45,5 +55,6 @@ Parent -up--|> Node
 Parent ---> Node : left_child
 Parent ---> Node : right_child
 RandomForestClassifier .down. Dataset
+RandomForestEvaluator o-right- RandomForestClassifier
 
 @enduml

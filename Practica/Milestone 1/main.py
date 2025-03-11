@@ -3,7 +3,7 @@ POO - Milestone 1
 Random Forest Classifier
 """
 
-from RandomForest import RandomForest
+from RandomForestClassifier import RandomForestClassifier
 
 if __name__ == "__main__":
     pass
