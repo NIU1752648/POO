@@ -28,7 +28,7 @@ class Dataset:
                 X_left=self._X[i]
             else:
                 X_right=self._X[i]
-        return X_left,X_right
+        return Dataset(X_left,self._y),Dataset(X_right,self._y)
 
     def random_sampling(self,ratio_samples):
         idx=np.random.permutation(range(self._num_samples))
