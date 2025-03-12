@@ -1,13 +1,13 @@
-@startuml RandomForestClassifier
+@startuml RandomForest
 
 class RandomForestEvaluator {
 -random_forest
 -train_dataset
 -test_dataset
-+train()
-+evaluate()
++train(multiprocessing: bool)
++evaluate(multiprocessing: bool)
 +graph_tree_answer(sample: np.array)
-+graph_performance()
++graph_trees_overall()
 }
 
 class RandomForestClassifier {
@@ -23,8 +23,18 @@ class RandomForestClassifier {
 -make_parent_or_leaf()
 -best_split()
 -cart_cost()
--{static}gini()
--{static}entropy()
+}
+
+interface Impurity {
+{abstract}+impurity_function(dataset: Dataset): float
+}
+
+class Gini_Index {
+    +impurity_function(dataset: Dataset): float
+}
+
+class Entropy {
+    +impurity_function(dataset: Dataset): float
 }
 
 interface Node {
@@ -46,15 +56,19 @@ class Dataset {
 + {static}num_features
 
 + most_frequent_label()
++ random_sampling()
 +split()
 }
 
+RandomForestClassifier *-down-> "1" Impurity: impurity_function
+Impurity <|-down- Gini_Index
+Impurity <|-down- Entropy
 RandomForestClassifier *-right-> "1..*" Node : decision_trees
 Leaf -up--|> Node
 Parent -up--|> Node
 Parent ---> Node : left_child
 Parent ---> Node : right_child
-RandomForestClassifier .down. Dataset
+RandomForestClassifier o-right- Dataset
 RandomForestEvaluator o-right- RandomForestClassifier
 
 @enduml
