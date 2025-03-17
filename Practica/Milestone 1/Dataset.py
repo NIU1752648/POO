@@ -23,12 +23,19 @@ class Dataset:
         return self._num_features
 
     def split(self,idx,val):
+        X_left = []
+        y_left = []
+        X_right = []
+        y_right = []
         for i in range(self._num_samples):
             if self._X[i,idx]<=val:
-                X_left=self._X[i]
+                X_left.append(self._X[i])
+                y_left.append(self._y[i])
             else:
-                X_right=self._X[i]
-        return Dataset(X_left,self._y),Dataset(X_right,self._y)
+                X_right.append(self._X[i])
+                y_right.append(self._y[i])
+
+        return Dataset(X_left,y_left), Dataset(X_right,y_right)
 
     def random_sampling(self,ratio_samples):
         idx=np.random.permutation(range(self._num_samples))
