@@ -12,7 +12,7 @@ class RandomForestClassifier:
         self.ratio_samples = 0.8 # Percentage of uses of the training set for training each tree (1.0 = 100%)
         self.max_depth = None # Maximum depth of the decision trees
         self.min_size = 1 # Minimum number of samples in a node to be considered for splitting
-        self.num_features = 0 # Number of features to consider when looking for the best split
+        self.num_features = 1 # Number of features to consider when looking for the best split
         self.decision_trees = []
         self.impurity_function = Impurities.GiniIndex()
 
@@ -20,7 +20,7 @@ class RandomForestClassifier:
         # X is a matrix of size (num_samples, num_features)
         # y is a vector of size (num_samples, 1)
         # a pair (X,y) is a dataset, with its own responsibilities
-        dataset = Dataset(X,y)
+        dataset = Dataset(X, y)
         self._make_decision_trees(dataset)
 
     def _make_decision_trees(self, dataset: Dataset):
@@ -49,7 +49,7 @@ class RandomForestClassifier:
     
     def _make_parent_or_leaf(self, dataset: Dataset, depth: int):
         # select a random subset of features, to make trees more diverse
-        idx_features = np.random.choice(dataset.num_features, self.num_features,replace=False)
+        idx_features = np.random.choice(range(dataset.num_features), self.num_features, replace=False)
         best_feature_index, best_threshold, minimum_cost, best_split = \
             self._best_split(dataset,idx_features)
         left_dataset, right_dataset = best_split
@@ -74,7 +74,7 @@ class RandomForestClassifier:
             values = np.unique(dataset.X[:,idx])
             for val in values:
                 left_dataset, right_dataset = dataset.split(idx,val)
-                cost = self._cart_cost(left_dataset,right_dataset)
+                cost = self._cart_cost(left_dataset,right_dataset, dataset)
                 if cost < minimum_cost:
                     best_feature_index, best_threshold, minimum_cost, best_split = \
                         idx, val, cost, [left_dataset,right_dataset]

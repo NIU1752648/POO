@@ -201,7 +201,7 @@ def main():
     try:
         sim = NBodySimulator(1000, Universe.from_file("data/2body.txt"))
     except FileNotFoundError:
-        sim = NBodySimulator(1000, Universe.from_file("data/5body.txt"))
+        sim = NBodySimulator(1000, Universe.from_file("Exercicis/Exercici 1/data/5body.txt"))
 
     #sim = NBodySimulator(1000, Universe.random(14))
 
