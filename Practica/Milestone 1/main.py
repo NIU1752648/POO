@@ -3,7 +3,15 @@ POO - Milestone 1
 Random Forest Classifier
 """
 
+import numpy as np
+import sklearn.datasets
 from RandomForestClassifier import RandomForestClassifier
+from Impurity import Impurities
 
 if __name__ == "__main__":
-    pass
+    iris = sklearn.datasets.load_iris()
+    X, y = iris.data, iris.target
+
+    forest = RandomForestClassifier()
+    forest.max_depth = 10
+    forest.fit(X, y)

@@ -2,6 +2,7 @@ from Parent import Parent
 from Leaf import Leaf
 from Dataset import Dataset
 import numpy as np
+from Impurity import Impurities
 
 class RandomForestClassifier:
     def __init__(self):
@@ -13,7 +14,7 @@ class RandomForestClassifier:
         self.min_size = 1 # Minimum number of samples in a node to be considered for splitting
         self.num_features = 0 # Number of features to consider when looking for the best split
         self.decision_trees = []
-        self.impurity_function = 'gini'
+        self.impurity_function = Impurities.GiniIndex()
 
     def fit(self, X: np.array, y: np.array):
         # X is a matrix of size (num_samples, num_features)
@@ -82,12 +83,8 @@ class RandomForestClassifier:
     def _cart_cost(self, left_dataset: Dataset, right_dataset: Dataset, dataset: Dataset):
         cost = 0
         # the J(k,v) equation
-        if self.impurity_function == 'gini':
-            cost = (left_dataset.num_samples/dataset.num_samples)*self._gini(left_dataset)\
-                + (right_dataset.num_samples/dataset.num_samples)*self._gini(right_dataset)
-        elif self.impurity_function == 'entropy':
-            cost = (left_dataset.num_samples / dataset.num_samples) * self._entropy(left_dataset) \
-                   + (right_dataset.num_samples / dataset.num_samples) * self._entropy(right_dataset)
+        cost = (left_dataset.num_samples/dataset.num_samples)*self._gini(left_dataset)\
+            + (right_dataset.num_samples/dataset.num_samples)*self._gini(right_dataset)
         return cost 
     
     @staticmethod
