@@ -35,6 +35,10 @@ class Dataset:
                 X_right.append(self._X[i])
                 y_right.append(self._y[i])
 
+        X_left = np.vstack(X_left) if X_left else np.empty((0, self._X.shape[1]))
+        X_right = np.vstack(X_right) if X_right else np.empty((0, self._X.shape[1]))
+        y_left = np.array(y_left)
+        y_right = np.array(y_right)
         return Dataset(X_left,y_left), Dataset(X_right,y_right)
 
     def random_sampling(self,ratio_samples):
