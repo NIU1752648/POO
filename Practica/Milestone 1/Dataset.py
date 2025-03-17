@@ -49,4 +49,4 @@ class Dataset:
         return Dataset(X_subset,y_subset)
 
     def most_frequent_label(self):
-        pass
+        return np.argmax(np.bincount(self._y))
