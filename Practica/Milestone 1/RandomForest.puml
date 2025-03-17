@@ -26,15 +26,15 @@ class RandomForestClassifier {
 }
 
 interface Impurity {
-{abstract}+impurity_function(dataset: Dataset): float
+{abstract}+impurity(dataset: Dataset): float
 }
 
-class Gini_Index {
-    +impurity_function(dataset: Dataset): float
+class GiniIndex {
+    +impurity(dataset: Dataset): float
 }
 
 class Entropy {
-    +impurity_function(dataset: Dataset): float
+    +impurity(dataset: Dataset): float
 }
 
 interface Node {
