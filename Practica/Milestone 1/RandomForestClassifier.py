@@ -1,20 +1,17 @@
-from Parent import Parent
-from Leaf import Leaf
-from Dataset import Dataset
 import numpy as np
+from Tree import Tree
+from Dataset import Dataset
 from Impurity import Impurities
 
 class RandomForestClassifier:
-    def __init__(self):
-        self.ratio_training = 0.7
-        self.ratio_testing = 0.3
-        self.num_trees = 100 # Number of trees in the forest
-        self.ratio_samples = 0.8 # Percentage of uses of the training set for training each tree (1.0 = 100%)
-        self.max_depth = None # Maximum depth of the decision trees
+    def __init__(self, num_trees = 100, ratio_samples = 0.8, max_depth = 10, impurity = Impurities.GiniIndex()):
+        self.num_trees = num_trees # Number of trees in the forest
+        self.ratio_samples = ratio_samples # Percentage of uses of the training set for training each tree (1.0 = 100%)
+        self.max_depth = max_depth # Maximum depth of the decision trees
         self.min_size = 1 # Minimum number of samples in a node to be considered for splitting
         self.num_features = 1 # Number of features to consider when looking for the best split
         self.decision_trees = []
-        self.impurity_function = Impurities.GiniIndex()
+        self.impurity = impurity
 
     def fit(self, X: np.array, y: np.array):
         # X is a matrix of size (num_samples, num_features)
@@ -24,7 +21,6 @@ class RandomForestClassifier:
         self._make_decision_trees(dataset)
 
     def _make_decision_trees(self, dataset: Dataset):
-        self.decision_trees = []
         for i in range(self.num_trees):
             # sample a subset of the dataset with replacement using
             # np.random.choice() to get the indices of rows in X and y
@@ -45,7 +41,7 @@ class RandomForestClassifier:
     @staticmethod
     def _make_leaf(dataset: Dataset):
         # label = most frequent class in dataset
-        return Leaf(dataset.most_frequent_label())
+        return Tree.Leaf(dataset.most_frequent_label())
     
     def _make_parent_or_leaf(self, dataset: Dataset, depth: int):
         # select a random subset of features, to make trees more diverse
@@ -61,7 +57,7 @@ class RandomForestClassifier:
             # dataset and none to the other, so we make leaf instead of a parent
             return self._make_leaf(dataset)
         else:
-            node = Parent(best_feature_index,best_threshold)
+            node = Tree.Parent(best_feature_index,best_threshold)
             node.left_child = self._make_node(left_dataset,depth+1)
             node.right_child = self._make_node(right_dataset,depth+1)
             return node
@@ -83,21 +79,9 @@ class RandomForestClassifier:
     def _cart_cost(self, left_dataset: Dataset, right_dataset: Dataset, dataset: Dataset):
         cost = 0
         # the J(k,v) equation
-        cost = (left_dataset.num_samples/dataset.num_samples)*self._gini(left_dataset)\
-            + (right_dataset.num_samples/dataset.num_samples)*self._gini(right_dataset)
-        return cost 
-    
-    @staticmethod
-    def _gini(dataset: Dataset):
-        # the Gini impurity equation
-        gini = 1
-        for label in np.unique(dataset.y):
-            count = 0
-            for elem in dataset.y:
-                if elem == label:
-                    count += 1
-            gini -= (count/dataset.num_samples)**2
-        return gini
+        cost = (left_dataset.num_samples/dataset.num_samples)*self.impurity.impurity(left_dataset)\
+            + (right_dataset.num_samples/dataset.num_samples)*self.impurity.impurity(right_dataset)
+        return cost
     
     @staticmethod
     def _entropy(dataset: Dataset):

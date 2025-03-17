@@ -61,7 +61,7 @@ class Dataset {
 }
 
 RandomForestClassifier *-down-> "1" Impurity: impurity_function
-Impurity <|-down- Gini_Index
+Impurity <|-down- GiniIndex
 Impurity <|-down- Entropy
 RandomForestClassifier *-right-> "1..*" Node : decision_trees
 Leaf -up--|> Node
