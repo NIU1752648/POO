@@ -1,8 +1,11 @@
 import numpy as np
+
+import Logger
 from Tree import Tree
 from Dataset import Dataset
 from Impurity import Impurities
 
+@Logger.log_instance
 class RandomForestClassifier:
     def __init__(self, num_trees = 100, ratio_samples = 0.8, max_depth = 10, impurity = Impurities.GiniIndex()):
         self.num_trees = num_trees # Number of trees in the forest
@@ -82,8 +85,3 @@ class RandomForestClassifier:
         cost = (left_dataset.num_samples/dataset.num_samples)*self.impurity.impurity(left_dataset)\
             + (right_dataset.num_samples/dataset.num_samples)*self.impurity.impurity(right_dataset)
         return cost
-    
-    @staticmethod
-    def _entropy(dataset: Dataset):
-        # The entropy impurity equation
-        return 1
