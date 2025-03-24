@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -5,9 +6,10 @@ from Tree import Tree
 from RandomForestClassifier import RandomForestClassifier
 
 class RandomForestEvaluator:
-    def __init__(self, random_forest: RandomForestClassifier, X: np.array,
+    def __init__(self, database_name: str, random_forest: RandomForestClassifier, X: np.array,
                  y: np.array, ratio_train = 0.7, ratio_test = 0.3):
         self._random_forest = random_forest
+        self._database_name = database_name
 
         self.ratio_train, self.ratio_test = ratio_train, ratio_test
         self.num_samples, self.num_features = X.shape
@@ -45,6 +47,14 @@ class RandomForestEvaluator:
             accuracy[tree_idx] /= self.num_samples_test
         return accuracy
 
+    @staticmethod
+    def _check_directory(directory_path):
+        if not os.path.exists(directory_path):  # Check if the directory exists
+            os.makedirs(directory_path)  # Create the directory
+            print(f"Directory '{directory_path}' was created.")
+        else:
+            print(f"Directory '{directory_path}' already exists.")
+
     def plot_accuracy(self):
         accuracy = self.evaluate
         plt.bar(range(1, len(accuracy) + 1, ), accuracy, color='blue')
@@ -53,4 +63,6 @@ class RandomForestEvaluator:
         plt.xlabel('Tree')
         plt.ylabel('Accuracy')
 
-        plt.show()
+        RandomForestEvaluator._check_directory('plots')
+
+        plt.savefig(f'plots/{self._database_name}_{str(self.random_forest.impurity)}.png')

@@ -4,24 +4,24 @@ Random Forest Classifier
 """
 
 # External dependencies
-import sklearn.datasets
+from sklearn.datasets import fetch_openml
 
 # Internal dependencies
 from Impurity import Impurities
 from RandomForestEvaluator import RandomForestEvaluator, RandomForestClassifier
 
 if __name__ == "__main__":
-    iris = sklearn.datasets.load_iris()
-    X, y = iris.data, iris.target
+    mnist = fetch_openml('mnist_784', version=1, as_frame=False)
+    X, y = mnist.data, mnist.target
 
     random_forest_gini = RandomForestEvaluator(
-        "Iris",
+        "Mnist",
         RandomForestClassifier(),
         X, y
     )
 
     random_forest_entropy = RandomForestEvaluator(
-        "Iris",
+        "Mnist",
         RandomForestClassifier(impurity = Impurities.Entropy()),
         X, y
     )

@@ -25,12 +25,15 @@ class RandomForestClassifier:
 
     def _make_decision_trees(self, dataset: Dataset):
         for i in range(self.num_trees):
-            # sample a subset of the dataset with replacement using
-            # np.random.choice() to get the indices of rows in X and y
-            subset=dataset.random_sampling(self.ratio_samples)
-            tree=self._make_node(subset,1) # the root of the decision tree
-            self.decision_trees.append(tree)
-    
+            self._make_tree(dataset)
+
+    def _make_tree(self, dataset):
+        # sample a subset of the dataset with replacement using
+        # np.random.choice() to get the indices of rows in X and y
+        subset = dataset.random_sampling(self.ratio_samples)
+        tree = self._make_node(subset, 1)  # the root of the decision tree
+        self.decision_trees.append(tree)
+
     def _make_node(self, dataset: Dataset, depth: int):
         if depth == self.max_depth\
             or dataset.num_samples <= self.min_size\
