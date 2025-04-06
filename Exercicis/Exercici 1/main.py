@@ -8,6 +8,8 @@ import math
 import numpy as np
 import pygame
 from random import uniform
+from sys import argv
+from argparse import ArgumentError
 
 class Body:
     G = 6.67e-11 # Static Attribute
@@ -199,11 +201,23 @@ class NBodySimulator:
 
 def main():
     try:
-        sim = NBodySimulator(1000, Universe.from_file("data/2body.txt"))
-    except FileNotFoundError:
-        sim = NBodySimulator(1000, Universe.from_file("data/5body.txt"))
+        filename = argv[1]
+    except IndexError:
+        raise ArgumentError(None, "Missing argument, FileName")
 
-    #sim = NBodySimulator(1000, Universe.random(14))
+    if filename == "random":
+        try:
+            num_bodies = int(argv[2])
+            print(f"Running random simulation with {num_bodies+1} bodies")
+            sim = NBodySimulator(1000, Universe.random(num_bodies))
+        except TypeError:
+            raise ArgumentError(None, "Argument NumBodies must be an integer")
+        except IndexError:
+            raise ArgumentError(None, "Missing argument for random, NumBodies")
+    else:
+        sim = NBodySimulator(1000, Universe.from_file(filename))
+
+
 
     print(sim.universe)
 

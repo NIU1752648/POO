@@ -1,10 +1,22 @@
-<h1>Programació Orientada a Objectes</h1>
-<i>Autors: Celia, Gea & Nico</i>
+# Programació Orientada a Objectes  
+*Autors: Celia, Gea & Nico*  
 
----
-<h3> Exercici 1: N-body problem</h3>
-<p>Inici: 19/02/2025</p>
-<b>Links importants: </b>
-<ul>
-    <li><a href="https://introcs.cs.princeton.edu/python/34nbody/">Case Study: N-body Simulation</a></a></li>
-</ul>
+---  
+
+## Exercici 1: N-body problem  
+**Inici:** 19/02/2025  
+**Final:** 06/04/2025  
+
+### Dependències  
+- Numpy: Versió 2.0.2  
+- Pygame: Versió 2.6.1  
+
+### Execució  
+- Configuració per arxiu:  
+`python main.py "data/3body2.txt"`  
+data/3body2.txt és un dels arxius d'exemple proporcionats al directory data.
+
+
+- Configuració aleatòria:  
+`python main.py random 3`  
+on 3 es el nombre de planetes
