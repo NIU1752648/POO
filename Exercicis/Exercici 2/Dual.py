@@ -25,7 +25,7 @@ class Dual:
         return self._b
 
     def __str__(self):
-        return f"<{self.a, self.b}>"
+        return f"<{self.a} {self.b}>"
 
     def __add__(self, other):
         return self.operate_two(other, Addition())
@@ -40,7 +40,7 @@ class Dual:
         return self.operate_two(other, Division())
 
     def __pow__(self, power: int):
-        if self.a == 0: raise ArithmeticError("Cannot raise a null Dual to any power.")
+        if self.a == 0 and power < 0: raise ZeroDivisionError()
         return self.operate_two(power, Exponent())
 
     def __abs__(self):
