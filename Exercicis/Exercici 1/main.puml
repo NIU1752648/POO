@@ -2,19 +2,22 @@
 
 class NBodySimulator {
 -step: float
--step_num: int
+-time_passed: int
 -t: float
-+NBodySimulator(universe: Universe, windowSize: int)
-+animate(): void
--draw_body(): void
+-update(): void
+-rescale(point: np.array): np.array
+-point(x: float, y: float, color, radius): void
++open_window(): void
++fill_screen(): void
++draw(trace: Bool): void
 }
 
 class Universe {
 -radius: float
 -numBodies: int
-+Universe(name: string): Universe
-+forces_acting_upon(body: Body) -> np.array
+-forces_acting_upon(body: Body) -> np.array
 +from_file(filename: string): Universe
++random(num_bodies: int): Universe
 }
 
 class Body {
