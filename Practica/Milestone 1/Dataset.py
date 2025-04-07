@@ -1,4 +1,5 @@
 import numpy as np
+import Logger
 
 class Dataset:
     def __init__(self,X:np.array,y:np.array):

@@ -2,12 +2,16 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 
+import Logger
 from Tree import Tree
 from RandomForestClassifier import RandomForestClassifier
 
 class RandomForestEvaluator:
     def __init__(self, database_name: str, random_forest: RandomForestClassifier, X: np.array,
                  y: np.array, ratio_train = 0.7, ratio_test = 0.3):
+        if y.shape[0] > 5000:
+            Logger.warning(f"Initializing random forest with big dataset - size: {X.shape}")
+
         self._random_forest = random_forest
         self._database_name = database_name
 
@@ -57,9 +61,10 @@ class RandomForestEvaluator:
 
     def plot_accuracy(self):
         accuracy = self.evaluate
+        Logger.info(f'{self._database_name} - Random forest ({str(self.random_forest.impurity)}) Accuracy: {np.mean(accuracy)}')
         plt.bar(range(1, len(accuracy) + 1, ), accuracy, color='blue')
 
-        plt.title(f'Random Forest ({self.random_forest.impurity})')
+        plt.title(f'{self._database_name} - Random Forest ({self.random_forest.impurity})')
         plt.xlabel('Tree')
         plt.ylabel('Accuracy')
 

@@ -30,3 +30,9 @@ def log_instance(cls):
             super().__init__(*args, **kwargs)
 
     return Wrapper
+
+def info(message):
+    logger.info(message)
+
+def warning(message):
+    logger.warning(message)
