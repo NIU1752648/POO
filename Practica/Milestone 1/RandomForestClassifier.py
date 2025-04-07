@@ -1,4 +1,5 @@
 import numpy as np
+from tqdm import tqdm
 
 import Logger
 from Tree import Tree
@@ -7,7 +8,7 @@ from Impurity import Impurities
 
 @Logger.log_instance
 class RandomForestClassifier:
-    def __init__(self, num_trees = 100, ratio_samples = 0.8, max_depth = 10, impurity = Impurities.GiniIndex()):
+    def __init__(self, num_trees = 100, ratio_samples = 0.8, max_depth = 10, impurity = Impurities.GiniIndex(), multi = False, random_trees = False):
         self.num_trees = num_trees # Number of trees in the forest
         self.ratio_samples = ratio_samples # Percentage of uses of the training set for training each tree (1.0 = 100%)
         self.max_depth = max_depth # Maximum depth of the decision trees
@@ -15,6 +16,8 @@ class RandomForestClassifier:
         self.num_features = 1 # Number of features to consider when looking for the best split
         self.decision_trees = []
         self.impurity = impurity
+        self.multiprocessing = multi
+        self.random_trees = random_trees
 
     def fit(self, X: np.array, y: np.array):
         # X is a matrix of size (num_samples, num_features)
@@ -24,7 +27,7 @@ class RandomForestClassifier:
         self._make_decision_trees(dataset)
 
     def _make_decision_trees(self, dataset: Dataset):
-        for i in range(self.num_trees):
+        for i in tqdm(range(self.num_trees), desc=f"Making trees ({str(self.impurity)})", ascii=False, ncols=100):
             self._make_tree(dataset)
 
     def _make_tree(self, dataset):

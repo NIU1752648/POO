@@ -1,4 +1,5 @@
 import numpy as np
+from multiprocessing import Pool
 
 from Dataset import Dataset
 from RandomForestClassifier import RandomForestClassifier

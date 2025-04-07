@@ -55,9 +55,9 @@ class RandomForestEvaluator:
     def _check_directory(directory_path):
         if not os.path.exists(directory_path):  # Check if the directory exists
             os.makedirs(directory_path)  # Create the directory
-            print(f"Directory '{directory_path}' was created.")
+            Logger.info(f"Directory '{directory_path}' was created.")
         else:
-            print(f"Directory '{directory_path}' already exists.")
+            Logger.info(f"Directory '{directory_path}' already exists.")
 
     def plot_accuracy(self):
         accuracy = self.evaluate
@@ -67,6 +67,7 @@ class RandomForestEvaluator:
         plt.title(f'{self._database_name} - Random Forest ({self.random_forest.impurity})')
         plt.xlabel('Tree')
         plt.ylabel('Accuracy')
+        plt.ylim((0, 1.0))
 
         RandomForestEvaluator._check_directory('plots')
 
