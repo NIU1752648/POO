@@ -19,13 +19,13 @@ if __name__ == "__main__":
 
     random_forest_gini = RandomForestEvaluator(
         "Sonar",
-        RandomForestClassifier(),
+        RandomForestClassifier(max_depth = 15),
         X, y
     )
 
     random_forest_entropy = RandomForestEvaluator(
         "Sonar",
-        RandomForestClassifier(impurity=Impurities.Entropy()),
+        RandomForestClassifier(max_depth = 15, impurity=Impurities.Entropy()),
         X, y
     )
 
