@@ -8,7 +8,10 @@ from Impurity import Impurities
 from RandomForestEvaluator import RandomForestEvaluator, RandomForestClassifier
 
 def load_sonar():
-    df = pd.read_csv('sonar.all-data.csv' ,header=None)
+    try:
+        df = pd.read_csv('sonar.all-data.csv' ,header=None)
+    except FileNotFoundError:
+        df = pd.read_csv('Practica/Milestone 1/sonar.all-data.csv', header=None)
     X = df[df.columns[:-1]].to_numpy()
     y = df[df.columns[-1]].to_numpy(dtype=str)
     y = (y=='M').astype(int) # M = mine, R = rock
