@@ -27,7 +27,7 @@ class RandomForestClassifier:
         self._make_decision_trees(dataset)
 
     def _make_decision_trees(self, dataset: Dataset):
-        for i in tqdm(range(self.num_trees), desc=f"Making trees ({str(self.impurity)})", ascii=False, ncols=100):
+        for i in tqdm(range(self.num_trees), desc=f"Planting trees ({str(self.impurity)})", ascii=False, ncols=100):
             self._make_tree(dataset)
 
     def _make_tree(self, dataset):
