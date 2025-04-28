@@ -1,13 +1,14 @@
 import numpy as np
-from multiprocessing import Pool
+import multiprocessing
 
 from Dataset import Dataset
 from RandomForestClassifier import RandomForestClassifier
 
 class RandomForestParallelism(RandomForestClassifier):
     def _make_decision_trees(self, dataset: Dataset):
-        super()._make_tree(dataset)
-        pass
+        with multiprocessing.Pool() as pool:
+            pool.map(self._make_tree(dataset),range(self.num_trees))
+
 
 class RandomForestExtraTrees(RandomForestClassifier):
     def _best_split(self, dataset: Dataset, idx_features: np.array):
