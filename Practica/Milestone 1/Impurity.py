@@ -37,4 +37,17 @@ class Impurities:
             return entropy
 
         def __str__(self):
-            return 'Entropy'
+            return 'Entropy'   
+
+    class SumSquareError(Impurity):
+        def __init__(self,samples):
+            self.m=len(samples)
+            self.samples=samples
+           
+        def SSE(self):
+            
+            mitjana=sum(self.samples)/self.m
+            return sum((x-mitjana)**2 for x in self.samples)
+        
+        def __str__(self):
+            return 'Sum of Square Errors'
