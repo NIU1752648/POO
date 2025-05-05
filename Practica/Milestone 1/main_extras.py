@@ -1,14 +1,14 @@
 from sklearn.datasets import fetch_openml
 
 from RandomForestEvaluator import RandomForestEvaluator
-from RandomForestCExtras import RandomForestParallelism
+from RandomForestCExtras import RandomForestPEC
 
 if __name__ == "__main__":
     mnist = fetch_openml('mnist_784', version=1, as_frame=False)
     X, y = mnist.data, mnist.target.astype(int)
     random_forest_gini = RandomForestEvaluator(
         "Mnist",
-        RandomForestParallelism(),
+        RandomForestPEC(),
         X, y
     )
 

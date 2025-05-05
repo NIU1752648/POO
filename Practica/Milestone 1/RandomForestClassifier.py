@@ -8,16 +8,14 @@ from Impurity import Impurities
 
 @Logger.log_instance
 class RandomForestClassifier:
-    def __init__(self, num_trees = 100, ratio_samples = 0.8, max_depth = 10, impurity = Impurities.GiniIndex(), multi = False, random_trees = False):
+    def __init__(self, num_trees = 100, ratio_samples = 0.8, max_depth = 10, impurity = Impurities.GiniIndex(), min_size = 1):
         self.num_trees = num_trees # Number of trees in the forest
         self.ratio_samples = ratio_samples # Percentage of uses of the training set for training each tree (1.0 = 100%)
         self.max_depth = max_depth # Maximum depth of the decision trees
-        self.min_size = 1 # Minimum number of samples in a node to be considered for splitting
+        self.min_size = min_size # Minimum number of samples in a node to be considered for splitting
         self.num_features = 1 # Number of features to consider when looking for the best split
         self.decision_trees = []
         self.impurity = impurity
-        self.multiprocessing = multi
-        self.random_trees = random_trees
 
     def fit(self, X: np.array, y: np.array):
         # X is a matrix of size (num_samples, num_features)
