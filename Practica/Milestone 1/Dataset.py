@@ -51,3 +51,6 @@ class Dataset:
 
     def most_frequent_label(self):
         return np.argmax(np.bincount(self._y))
+    
+    def mean_value(self):
+        return np.mean(self._y)
