@@ -1,0 +1,79 @@
+@startuml Regression
+
+class RandomForestEvaluator {
+-random_forest
+-train_dataset
+-test_dataset
++train(multiprocessing: bool)
++evaluate(multiprocessing: bool)
++graph_tree_answer(sample: np.array)
++graph_trees_overall()
+}
+
+class RandomForestClassifier {
++ratio_training
++ratio_testing
++num_trees
++ratio_samples
++max_depth
++fit()
+-make_decision_trees()
+-make_node()
+- {static}make_leaf()
+-make_parent_or_leaf()
+-best_split()
+-cart_cost()
+}
+
+interface Impurity {
+{abstract}+compute(dataset: Dataset): float
+}
+
+class GiniIndex {
+    +compute(dataset: Dataset): float
+}
+
+class Entropy {
+    +compute(dataset: Dataset): float
+}
+
+class SumSquareError{
+    +compute(dataset: Dataset): float
+}
+
+interface Node {
+{abstract} +predict(x : list(float)) : int
+}
+
+class Leaf {
++predict(x : list(float)) : int
+}
+
+class Parent {
++predict(x : list(float)) : int
+}
+
+class Dataset {
++ {static}X
++ {static}y
++ {static}num_samples
++ {static}num_features
+
++ most_frequent_label()
++ random_sampling()
++split()
+}
+
+RandomForestClassifier *-down-> "1" Impurity: impurity_function
+Impurity <|-.down- GiniIndex
+Impurity <|-.down- Entropy
+Impurity <|-.down- SumSquareError
+RandomForestClassifier *-right-> "1..*" Node : decision_trees
+Leaf -up.-|> Node
+Parent -up.-|> Node
+Parent ---> Node : left_child
+Parent ---> Node : right_child
+RandomForestClassifier o-right- Dataset
+RandomForestEvaluator o-right- RandomForestClassifier
+
+@enduml
