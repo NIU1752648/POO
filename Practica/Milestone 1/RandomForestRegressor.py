@@ -1,3 +1,5 @@
+import numpy as np
+
 from RandomForestClassifier import RandomForestClassifier
 from Impurity import Impurities
 from Dataset import Dataset
@@ -11,3 +13,6 @@ class RandomForestRegressor(RandomForestClassifier):
     def _make_leaf(dataset:Dataset):
         return Tree.Leaf(dataset.mean_value())
 
+    @staticmethod
+    def _combine_predictions(prediccions: list):
+        return np.mean(prediccions)

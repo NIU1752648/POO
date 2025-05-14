@@ -27,7 +27,5 @@ if __name__ == "__main__":
     )
 
     random_forest_gini.train()
-    random_forest_entropy.train()
 
-    random_forest_gini.plot_accuracy()
-    random_forest_entropy.plot_accuracy()
+    print(f"Accuracy: {random_forest_gini.accuracy}")

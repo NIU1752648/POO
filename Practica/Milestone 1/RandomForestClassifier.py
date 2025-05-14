@@ -89,3 +89,22 @@ class RandomForestClassifier:
         cost = (left_dataset.num_samples/dataset.num_samples)*self.impurity.impurity(left_dataset)\
             + (right_dataset.num_samples/dataset.num_samples)*self.impurity.impurity(right_dataset)
         return cost
+
+    @staticmethod
+    def _combine_predictions(prediccions: list):
+        return np.argmax(np.bincount(prediccions))
+
+    def predict(self, X_test: np.array):
+        y_pred = list()
+        for x in X_test:
+            prediccions = list()
+            for tree in self.decision_trees:
+                parent = tree
+                while isinstance(parent, Tree.Parent):
+                    if parent.predict(x):
+                        parent = parent.left_child
+                    else:
+                        parent = parent.right_child
+                prediccions.append(parent.predict(x))
+            y_pred.append(self._combine_predictions(prediccions))
+        return np.array(y_pred)

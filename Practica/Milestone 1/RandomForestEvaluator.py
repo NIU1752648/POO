@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import Logger
 from Tree import Tree
 from RandomForestClassifier import RandomForestClassifier
+from RandomForestRegressor import RandomForestRegressor
 
 class RandomForestEvaluator:
     def __init__(self, database_name: str, random_forest: RandomForestClassifier, X: np.array,
@@ -50,6 +51,18 @@ class RandomForestEvaluator:
                     accuracy[tree_idx] += 1
             accuracy[tree_idx] /= self.num_samples_test
         return accuracy
+
+    @property
+    def accuracy(self):
+        preds = self.predict
+        count = 0
+        for i, pred in enumerate(preds):
+            if pred == self.y_test[i]: count += 1
+        return count/self.num_samples
+
+    @property
+    def predict(self):
+        return self.random_forest.predict(self.X_test)
 
     @staticmethod
     def _check_directory(directory_path):
