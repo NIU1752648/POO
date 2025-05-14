@@ -10,6 +10,11 @@ from RandomForestRegressor import RandomForestRegressor
 class RandomForestEvaluator:
     def __init__(self, database_name: str, random_forest: RandomForestClassifier, X: np.array,
                  y: np.array, ratio_train = 0.7, ratio_test = 0.3):
+        if np.any(np.isnan(X)) or np.any(np.isnan(y)):
+            Logger.warning("Input data contains NaN values. This may cause problems.")
+        if np.any(np.isinf(X)) or np.any(np.isinf(y)):
+            Logger.warning("Input data contains infinite values. This may cause problems.")
+
         if y.shape[0] > 5000:
             Logger.warning(f"Initializing random forest with big dataset - size: {X.shape}")
 
@@ -25,8 +30,12 @@ class RandomForestEvaluator:
         self.num_samples_test = int(self.num_samples * ratio_test)
         self.idx_train = idx[:self.num_samples_train]
         self.idx_test = idx[self.num_samples_train: self.num_samples_train + self.num_samples_test]
+        self.X, self.y = X, y
         self.X_train, self.y_train = X[self.idx_train], y[self.idx_train]
         self.X_test, self.y_test = X[self.idx_test], y[self.idx_test]
+
+        if self.num_samples_test == 0:
+            raise ValueError("Test set size is zero. Adjust your train/test split ratios.")
 
     @property
     def random_forest(self):
@@ -54,13 +63,12 @@ class RandomForestEvaluator:
 
     @property
     def accuracy(self):
-        preds = self.predict
+        preds = self.predict()
         count = 0
         for i, pred in enumerate(preds):
             if pred == self.y_test[i]: count += 1
         return count/self.num_samples
 
-    @property
     def predict(self):
         return self.random_forest.predict(self.X_test)
 
@@ -71,6 +79,29 @@ class RandomForestEvaluator:
             Logger.info(f"Directory '{directory_path}' was created.")
         else:
             Logger.info(f"Directory '{directory_path}' already exists.")
+
+    def test_regression(self, last_years_test = 1):
+        plt.figure()
+        plt.plot(self.y, '.-')
+        plt.xlabel('day in 10 years'), plt.ylabel('min. daily temp')
+        idx = last_years_test*365
+        idx = min(idx, len(self.y_test))
+        plt.figure()
+        x = range(idx)
+        ypred = self.predict()[:idx]
+        ytest = self.y_test[:idx]
+        for t, y1, y2 in zip(x, ytest, ypred):
+            plt.plot([t, t], [y1, y2], 'k-')
+        plt.plot([x[0], x[0]], [ytest[0], ypred[0]], 'k-', label='error')
+        plt.plot(x, ytest, 'g.', label='test')
+        plt.plot(x, ypred, 'y.', label='prediction')
+        plt.xlabel('day in last {} years'.format(last_years_test))
+        plt.ylabel('min. daily temperature')
+        plt.legend()
+        errors = ytest - ypred
+        rmse = np.sqrt(np.mean(errors ** 2))
+        plt.title('root mean square error : {:.3f}'.format(rmse))
+        plt.show()
 
     def plot_accuracy(self):
         accuracy = self.evaluate
