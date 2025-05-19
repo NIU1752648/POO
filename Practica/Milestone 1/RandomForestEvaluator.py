@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import Logger
-from Tree import Tree
+from Tree import Tree, Visitors
 from RandomForestClassifier import RandomForestClassifier
 from RandomForestRegressor import RandomForestRegressor
 
@@ -103,6 +103,40 @@ class RandomForestEvaluator:
         plt.title('root mean square error : {:.3f}'.format(rmse))
         plt.show()
 
+    def feature_importance(self):
+        feat_imp_visitor = Visitors.FeatureImportance()
+        for tree in self.random_forest.decision_trees:
+            tree.accept_visitor(feat_imp_visitor)
+        return feat_imp_visitor.occurrences
+
+    def plot_fi(self):
+        f_i = self.feature_importance()
+        labels, values = list(f_i.keys()), list(f_i.values())
+        plt.figure()
+        fig, ax = plt.subplots(figsize=(8, 6))
+
+        # Create a colormap
+        cmap = plt.cm.viridis  # You can choose any colormap you like
+        norm = plt.Normalize(min(values), max(values))
+
+        # Create colorbar
+        sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
+        sm.set_array([])
+        plt.colorbar(sm, ax=ax, label='Value')
+
+        # Plot bars with colors
+        bars = ax.bar(labels, values, color=cmap(norm(values)))
+
+        plt.title('Feature Importance')
+        plt.xlabel('Feature Index')
+        plt.ylabel('Node Usage')
+        plt.show()
+
+    def print_trees(self):
+        for tree in self.random_forest.decision_trees:
+            tree_printer = Visitors.PrinterTree()
+            tree.accept_visitor(tree_printer)
+
     def plot_accuracy(self):
         accuracy = self.evaluate
         Logger.info(f'{self._database_name} - Random forest ({str(self.random_forest.impurity)}) Accuracy: {np.mean(accuracy)}')
@@ -116,3 +150,25 @@ class RandomForestEvaluator:
         RandomForestEvaluator._check_directory('plots')
 
         plt.savefig(f'plots/{self._database_name}_{str(self.random_forest.impurity)}.png')
+
+    def plot_fi_mnist(self):
+        # Create empty 28x28 grid
+        grid = np.zeros((28, 28))
+
+        # Fill the grid with importance values
+        for idx, importance in self.feature_importance().items():
+            row = idx // 28
+            col = idx % 28
+            grid[row, col] = importance
+
+        # Create plot
+        plt.figure(figsize=(10, 8))
+        im = plt.imshow(grid, cmap='viridis')
+
+        # Add colorbar
+        cbar = plt.colorbar(im, fraction=0.046, pad=0.04)
+        cbar.set_label('Feature Importance', rotation=270, labelpad=15)
+
+        plt.title('Pixel Importance Heatmap (28x28)')
+        plt.axis('off')
+        plt.show()

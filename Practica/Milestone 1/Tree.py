@@ -1,3 +1,4 @@
+from __future__ import annotations
 from abc import ABC, abstractmethod
 from collections import deque
 
@@ -5,12 +6,14 @@ class Tree:
     class Node(ABC):
         @abstractmethod
         def __init__(self):
-            """Constructor must be implemented by all subclasses"""
             pass
 
         @abstractmethod
         def predict(self, x):
-            """Predict must be implemented by all subclasses"""
+            pass
+
+        @abstractmethod
+        def accept_visitor(self, v: Visitor):
             pass
 
     class Leaf(Node):
@@ -23,6 +26,9 @@ class Tree:
 
         def predict(self, x):
             return self.label
+
+        def accept_visitor(self, v: Visitor):
+            v.visitLeaf(self)
 
     class Parent(Node):
         def __init__(self, feature_index: int, threshold: float):
@@ -42,13 +48,53 @@ class Tree:
         def predict(self, x):
             return x[self._feature_index] < self._threshold
 
-        def __iter__(self):
-            queue = deque([self])  # Initialize the queue with the root node
-            while queue:
-                node = queue.popleft()  # Get the next node
-                yield node # Yield the current node's value
-                if isinstance(node, Tree.Parent):
-                    if node.left_child is not Tree.Leaf: # Add children to the queue
-                        queue.append(node.left_child)
-                    if node.right_child is not Tree.Leaf:
-                        queue.append(node.right_child)
+        def accept_visitor(self, v: Visitor):
+            v.visitParent(self)
+
+    class Visitor(ABC):
+        @abstractmethod
+        def visitParent(self, p: Parent):
+            pass
+
+        @abstractmethod
+        def visitLeaf(self, p: Leaf):
+            pass
+
+class Visitors:
+    class FeatureImportance(Tree.Visitor):
+        def __init__(self):
+            self._occurrences = dict()
+
+        @property
+        def occurrences(self):
+            return self._occurrences
+
+        def visitParent(self, p: Tree.Parent):
+            k = p.feature_index
+            if k in self._occurrences.keys():
+                self._occurrences[k] += 1
+            else:
+                self._occurrences[k] = 1
+
+            p.left_child.accept_visitor(self)
+            p.right_child.accept_visitor(self)
+
+        def visitLeaf(self, p: Tree.Leaf):
+            pass
+
+        def print_importance(self):
+            print(self._occurrences)
+
+    class PrinterTree(Tree.Visitor):
+        def __init__(self):
+            self._depth = 0
+
+        def visitParent(self, p: Tree.Parent):
+            print('     ' * self._depth + f'parent, {p.feature_index}, {p.threshold}')
+            self._depth += 1
+            p.left_child.accept_visitor(self)
+            p.right_child.accept_visitor(self)
+            self._depth -= 1
+
+        def visitLeaf(self, p: Tree.Leaf):
+            print('     ' * self._depth + f'leaf, {p.label}')

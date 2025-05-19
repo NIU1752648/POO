@@ -4,12 +4,23 @@ import multiprocessing
 from Dataset import Dataset
 from RandomForestClassifier import RandomForestClassifier
 
+def _worker(forest, dataset, tree_index):
+    forest._make_tree(dataset)
+
 class RandomForestParallelism(RandomForestClassifier):
     def _make_decision_trees(self, dataset: Dataset):
-        def tree():
-            self._make_tree(dataset)
-        with multiprocessing.Pool() as pool:
-            pool.map(tree, range(self.num_trees))
+        """Hola que tal"""
+        with multiprocessing.Manager() as manager:
+            shared_trees = manager.list()
+
+            original_trees = self.decision_trees
+            self.decision_trees = shared_trees
+
+            with multiprocessing.Pool() as pool:
+                pool.map(_worker, range(self.num_trees))
+
+            self.decision_trees = original_trees
+            self.decision_trees.extend(list(shared_trees))
 
 
 class RandomForestExtraTrees(RandomForestClassifier):
@@ -27,10 +38,16 @@ class RandomForestExtraTrees(RandomForestClassifier):
 
 class RandomForestPEC(RandomForestClassifier):
     def _make_decision_trees(self, dataset: Dataset):
-        def tree():
-            self._make_tree(dataset)
-        with multiprocessing.Pool() as pool:
-            pool.map(tree, range(self.num_trees))
+        with multiprocessing.Manager() as manager:
+            shared_trees = manager.list()
+            original_trees = self.decision_trees
+            self.decision_trees = shared_trees
+
+            with multiprocessing.Pool() as pool:
+                pool.starmap(_worker, [(self, dataset, i) for i in range(self.num_trees)])
+
+            self.decision_trees = original_trees
+            self.decision_trees.extend(list(shared_trees))
 
     def _best_split(self, dataset: Dataset, idx_features: np.array):
         best_feature_index, best_threshold, minimum_cost, best_split = \

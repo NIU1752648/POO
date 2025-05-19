@@ -28,3 +28,6 @@ if __name__ == "__main__":
     info(f"Time elapsed while making trees {time_elapsed}")
 
     random_forest_gini.plot_accuracy()
+    random_forest_gini.print_trees()
+    print(random_forest_gini.feature_importance())
+    random_forest_gini.plot_fi_mnist()
