@@ -40,6 +40,7 @@ class Impurities:
             return 'Entropy'   
 
     class SumSquareError(Impurity):
+        # Impurity measure for regression tasks (sum of squared errors).
         def impurity(self, dataset) -> float:
             return np.sum((dataset.y - dataset.mean_value()) ** 2)
         

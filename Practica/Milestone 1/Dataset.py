@@ -9,10 +9,12 @@ class Dataset:
 
     @property
     def X(self):
+        # X is a matrix of size (num_samples, num_features)
         return self._X
     
     @property
     def y(self):
+        # y is a vector of size (num_samples)
         return self._y
     
     @property
@@ -24,6 +26,7 @@ class Dataset:
         return self._num_features
 
     def split(self,idx,val):
+        # Split the dataset into two subsets based on based on feature threshold
         X_left = []
         y_left = []
         X_right = []
@@ -43,6 +46,7 @@ class Dataset:
         return Dataset(X_left,y_left), Dataset(X_right,y_right)
 
     def random_sampling(self,ratio_samples):
+        # Randomly sample a subset of the dataset
         idx=np.random.permutation(range(self._num_samples))
         num_samples_subset=int(self._num_samples*ratio_samples)
         idx_subset=idx[:num_samples_subset]
@@ -50,7 +54,9 @@ class Dataset:
         return Dataset(X_subset,y_subset)
 
     def most_frequent_label(self):
+        # Return the most frequent label in the dataset
         return np.argmax(np.bincount(self._y))
     
     def mean_value(self):
+        # Return the mean value of the target variable
         return np.mean(self._y)

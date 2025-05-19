@@ -62,6 +62,7 @@ class Tree:
 
 class Visitors:
     class FeatureImportance(Tree.Visitor):
+        # Counts the number of times each feature is used in the tree
         def __init__(self):
             self._occurrences = dict()
 
@@ -86,6 +87,7 @@ class Visitors:
             print(self._occurrences)
 
     class PrinterTree(Tree.Visitor):
+        # Prints the tree in a readable format
         def __init__(self):
             self._depth = 0
 

@@ -92,9 +92,11 @@ class RandomForestClassifier:
 
     @staticmethod
     def _combine_predictions(prediccions: list):
+        # combine the predictions of the trees by taking the most frequent class
         return np.argmax(np.bincount(prediccions))
 
     def predict(self, X_test: np.array):
+        # predict target values for the test set
         y_pred = list()
         for x in X_test:
             prediccions = list()
