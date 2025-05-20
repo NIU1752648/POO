@@ -14,7 +14,7 @@ class RandomForestEvaluator:
             Logger.warning("Input data contains NaN values. This may cause problems.")
         if np.any(np.isinf(X)) or np.any(np.isinf(y)):
             Logger.warning("Input data contains infinite values. This may cause problems.")
-
+        #warn if Dataset (y) is too long
         if y.shape[0] > 5000:
             Logger.warning(f"Initializing random forest with big dataset - size: {X.shape}")
 
@@ -22,12 +22,14 @@ class RandomForestEvaluator:
         self._database_name = database_name
 
         self.ratio_train, self.ratio_test = ratio_train, ratio_test
-        self.num_samples, self.num_features = X.shape
-
+        self.num_samples, self.num_features = X.shape #total samples and features count
+        #randomly shuffle indices for dividing the dataset
         idx = np.random.permutation(range(self.num_samples))
 
+        #compute number of training and testing samples
         self.num_samples_train = int(self.num_samples * ratio_train)
         self.num_samples_test = int(self.num_samples * ratio_test)
+        #assign indices for train and test sets
         self.idx_train = idx[:self.num_samples_train]
         self.idx_test = idx[self.num_samples_train: self.num_samples_train + self.num_samples_test]
         self.X, self.y = X, y
@@ -42,27 +44,31 @@ class RandomForestEvaluator:
         return self._random_forest
 
     def train(self):
+        #train the random forest on training data
         self.random_forest.fit(self.X_train, self.y_train)
 
     @property
     def evaluate(self):
+        #evaluate the accuracy of each tree in the forest individually
         accuracy = list()
         for tree_idx, tree in enumerate(self.random_forest.decision_trees):
             accuracy.append(0)
             for row, sample in enumerate(self.X_test):
                 parent = tree
-                while isinstance(parent, Tree.Parent):
+                while isinstance(parent, Tree.Parent): #traverse the tree until reaching a leaf
                     if parent.predict(sample):
                         parent = parent.left_child
                     else:
                         parent = parent.right_child
-                if parent.predict(sample) == self.y_test[row]:
+                if parent.predict(sample) == self.y_test[row]: #compare leaf prediction with true label
                     accuracy[tree_idx] += 1
+            #normalize accuracy by number of test samples
             accuracy[tree_idx] /= self.num_samples_test
-        return accuracy
+        return accuracy #list of accuracies per tree
 
     @property
     def accuracy(self):
+        #compute overall accuracy of the forest
         preds = self.predict()
         count = 0
         for i, pred in enumerate(preds):
@@ -74,15 +80,16 @@ class RandomForestEvaluator:
 
     @staticmethod
     def _check_directory(directory_path):
-        if not os.path.exists(directory_path):  # Check if the directory exists
-            os.makedirs(directory_path)  # Create the directory
-            Logger.info(f"Directory '{directory_path}' was created.")
+        if not os.path.exists(directory_path):  #check if the directory exists
+            os.makedirs(directory_path)  #create the directory
+            Logger.info(f"Directory '{directory_path}' was created.") #log creation
         else:
-            Logger.info(f"Directory '{directory_path}' already exists.")
+            Logger.info(f"Directory '{directory_path}' already exists.") #log existing
 
     def test_regression(self, last_years_test = 1):
+        #plot ground truth vs predictions for regression
         plt.figure()
-        plt.plot(self.y, '.-')
+        plt.plot(self.y, '.-') #show all data points
         plt.xlabel('day in 10 years'), plt.ylabel('min. daily temp')
         idx = last_years_test*365
         idx = min(idx, len(self.y_test))
@@ -90,10 +97,11 @@ class RandomForestEvaluator:
         x = range(idx)
         ypred = self.predict()[:idx]
         ytest = self.y_test[:idx]
+        #draw vertical lines for each error
         for t, y1, y2 in zip(x, ytest, ypred):
             plt.plot([t, t], [y1, y2], 'k-')
-        plt.plot([x[0], x[0]], [ytest[0], ypred[0]], 'k-', label='error')
-        plt.plot(x, ytest, 'g.', label='test')
+        plt.plot([x[0], x[0]], [ytest[0], ypred[0]], 'k-', label='error') #actual points
+        plt.plot(x, ytest, 'g.', label='test') #points predicted
         plt.plot(x, ypred, 'y.', label='prediction')
         plt.xlabel('day in last {} years'.format(last_years_test))
         plt.ylabel('min. daily temperature')
@@ -104,6 +112,7 @@ class RandomForestEvaluator:
         plt.show()
 
     def feature_importance(self):
+        #visitor that tracks how often each feature is used
         feat_imp_visitor = Visitors.FeatureImportance()
         for tree in self.random_forest.decision_trees:
             tree.accept_visitor(feat_imp_visitor)
@@ -149,7 +158,7 @@ class RandomForestEvaluator:
 
         RandomForestEvaluator._check_directory('plots')
 
-        plt.savefig(f'plots/{self._database_name}_{str(self.random_forest.impurity)}.png')
+        plt.savefig(f'plots/{self._database_name}_{str(self.random_forest.impurity)}.png') #save plot to file
 
     def plot_fi_mnist(self):
         # Create empty 28x28 grid
