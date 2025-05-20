@@ -22,7 +22,7 @@ if __name__ == "__main__":
 
     random_forest_gini = RandomForestEvaluator(
         "Sonar",
-        RandomForestClassifier(max_depth = 15, num_trees = 150, min_size = 5),
+        RandomForestClassifier(),
         X, y
     )
 
@@ -33,7 +33,5 @@ if __name__ == "__main__":
     )
 
     random_forest_gini.train()
-    random_forest_entropy.train()
 
-    random_forest_gini.plot_accuracy()
-    random_forest_entropy.plot_accuracy()
+    random_forest_gini.plot_fi()

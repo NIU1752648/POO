@@ -28,4 +28,4 @@ if __name__ == "__main__":
 
     random_forest_gini.train()
 
-    print(f"Accuracy: {random_forest_gini.accuracy}")
+    random_forest_gini.plot_fi()
